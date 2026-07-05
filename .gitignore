@@ -19,6 +19,7 @@ dist-ssr
 # Project-specific configuration (not to be committed)
 CLAUDE.md
 .claude/
+.superpowers/
 
 # Editor directories and files
 .vscode/*
