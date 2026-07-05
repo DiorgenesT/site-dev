@@ -6,3 +6,17 @@
   --color-vermelho-punk: #c81d25;
   --color-amarelo-fita: #e8b923;
 }
+
+.textura-granulada {
+  position: relative;
+}
+
+.textura-granulada::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('/textura/granulacao.svg');
+  background-repeat: repeat;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
