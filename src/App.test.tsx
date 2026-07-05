@@ -1,10 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import App from './App';
 
 describe('App', () => {
-  it('deve renderizar sem lancar erro', () => {
+  it('renderiza os componentes base da fundacao sem lancar erro', () => {
     render(<App />);
-    expect(document.body).toBeInTheDocument();
+    expect(screen.getByLabelText('DG')).toBeInTheDocument();
+    expect(screen.getByText('Python & AI Engineer')).toBeInTheDocument();
   });
 });
