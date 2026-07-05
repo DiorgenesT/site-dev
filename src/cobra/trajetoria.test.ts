@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { amostrarCurvaUniforme, RESOLUCAO_COMPRIMENTO_ARCO } from './trajetoria';
+import {
+  amostrarCurvaUniforme,
+  RESOLUCAO_COMPRIMENTO_ARCO,
+  construirTrajetoria,
+} from './trajetoria';
 import type { Ponto } from './tipos';
 
 describe('amostrarCurvaUniforme', () => {
@@ -53,5 +57,61 @@ describe('amostrarCurvaUniforme', () => {
 
   it('lanca erro com menos de 2 waypoints', () => {
     expect(() => amostrarCurvaUniforme([{ x: 0, y: 0 }], 10)).toThrow();
+  });
+});
+
+describe('construirTrajetoria', () => {
+  it('amostrar(0) retorna o primeiro waypoint', () => {
+    const trajetoria = construirTrajetoria([
+      { x: 0, y: 0 },
+      { x: 50, y: 50 },
+      { x: 100, y: 0 },
+    ]);
+    const ponto = trajetoria.amostrar(0);
+    expect(ponto.x).toBeCloseTo(0, 1);
+    expect(ponto.y).toBeCloseTo(0, 1);
+  });
+
+  it('amostrar(1) retorna o ultimo waypoint', () => {
+    const trajetoria = construirTrajetoria([
+      { x: 0, y: 0 },
+      { x: 50, y: 50 },
+      { x: 100, y: 0 },
+    ]);
+    const ponto = trajetoria.amostrar(1);
+    expect(ponto.x).toBeCloseTo(100, 1);
+    expect(ponto.y).toBeCloseTo(0, 1);
+  });
+
+  it('parametriza por comprimento de arco, nao por indice de segmento (velocidade constante)', () => {
+    // 3 waypoints colineares no eixo x, MUITO desigualmente espacados:
+    // primeiro segmento tem comprimento 1, segundo tem comprimento 99.
+    // Se fosse por indice de segmento, amostrar(0.5) cairia perto de x=1 (fim do primeiro segmento).
+    // Por comprimento de arco, amostrar(0.5) deve cair perto do meio do comprimento TOTAL (100/2=50).
+    // A margem [40,60] (em vez de um valor mais exato) absorve o overshoot conhecido do
+    // Catmull-Rom uniforme para waypoints tao desiguais (a curva "ultrapassa" x=0 no primeiro
+    // segmento antes de seguir, o que desloca o meio real do arco para ~43 em vez de 50).
+    // Nao apertar esse assert sem entender esse comportamento herdado da amostragem (Task 2).
+    const trajetoria = construirTrajetoria([
+      { x: 0, y: 0 },
+      { x: 1, y: 0 },
+      { x: 100, y: 0 },
+    ]);
+    const meio = trajetoria.amostrar(0.5);
+    expect(meio.x).toBeGreaterThan(40);
+    expect(meio.x).toBeLessThan(60);
+  });
+
+  it('e monotonica em x para waypoints colineares crescentes', () => {
+    const trajetoria = construirTrajetoria([
+      { x: 0, y: 0 },
+      { x: 100, y: 0 },
+    ]);
+    let anteriorX = -Infinity;
+    for (let i = 0; i <= 10; i += 1) {
+      const ponto = trajetoria.amostrar(i / 10);
+      expect(ponto.x).toBeGreaterThanOrEqual(anteriorX);
+      anteriorX = ponto.x;
+    }
   });
 });

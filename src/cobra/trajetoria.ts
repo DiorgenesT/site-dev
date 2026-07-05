@@ -58,3 +58,60 @@ export function amostrarCurvaUniforme(waypoints: readonly Ponto[], resolucao: nu
 
   return amostras;
 }
+
+export interface Trajetoria {
+  amostrar(progresso: number): Ponto;
+}
+
+function distancia(a: Ponto, b: Ponto): number {
+  return Math.hypot(b.x - a.x, b.y - a.y);
+}
+
+export function construirTrajetoria(waypoints: readonly Ponto[]): Trajetoria {
+  const amostras = amostrarCurvaUniforme(waypoints, RESOLUCAO_COMPRIMENTO_ARCO);
+
+  const comprimentosAcumulados: number[] = [0];
+  for (let i = 1; i < amostras.length; i += 1) {
+    const anterior = obterPontoOuFalhar(amostras, i - 1);
+    const atual = obterPontoOuFalhar(amostras, i);
+    const comprimentoAnterior = comprimentosAcumulados[i - 1] ?? 0;
+    comprimentosAcumulados.push(comprimentoAnterior + distancia(anterior, atual));
+  }
+
+  const comprimentoTotal = comprimentosAcumulados[comprimentosAcumulados.length - 1] ?? 0;
+
+  function amostrar(progresso: number): Ponto {
+    if (comprimentoTotal === 0) {
+      return obterPontoOuFalhar(amostras, 0);
+    }
+
+    const progressoLimitado = Math.min(Math.max(progresso, 0), 1);
+    const alvo = progressoLimitado * comprimentoTotal;
+
+    let indice = 0;
+    while (
+      indice < comprimentosAcumulados.length - 1 &&
+      (comprimentosAcumulados[indice + 1] ?? 0) < alvo
+    ) {
+      indice += 1;
+    }
+
+    const indiceSeguinte = Math.min(indice + 1, amostras.length - 1);
+    const comprimentoInicio = comprimentosAcumulados[indice] ?? 0;
+    const comprimentoFim = comprimentosAcumulados[indiceSeguinte] ?? comprimentoInicio;
+    const fracao =
+      comprimentoFim === comprimentoInicio
+        ? 0
+        : (alvo - comprimentoInicio) / (comprimentoFim - comprimentoInicio);
+
+    const pontoInicio = obterPontoOuFalhar(amostras, indice);
+    const pontoFim = obterPontoOuFalhar(amostras, indiceSeguinte);
+
+    return {
+      x: pontoInicio.x + (pontoFim.x - pontoInicio.x) * fracao,
+      y: pontoInicio.y + (pontoFim.y - pontoInicio.y) * fracao,
+    };
+  }
+
+  return { amostrar };
+}
