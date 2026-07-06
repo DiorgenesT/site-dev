@@ -1015,7 +1015,7 @@ interface OpcoesCobra {
 }
 
 interface EstadoCobra {
-  buffer: BufferCircular;
+  bufferRef: RefObject<BufferCircular>;
   fatorDocking: number;
 }
 
@@ -1118,7 +1118,7 @@ export function useCobra({ refInicio, refFim }: OpcoesCobra): EstadoCobra {
     };
   }, [refInicio, refFim]);
 
-  return { buffer: bufferRef.current, fatorDocking: fator };
+  return { bufferRef, fatorDocking: fator };
 }
 ```
 
@@ -1167,7 +1167,7 @@ export function CamadaCobra({ refInicio, refFim, refBotaoDestino }: CamadaCobraP
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const eloRef = useRef<HTMLDivElement | null>(null);
   const flipTweenRef = useRef<gsap.core.Tween | null>(null);
-  const { buffer, fatorDocking } = useCobra({ refInicio, refFim });
+  const { bufferRef, fatorDocking } = useCobra({ refInicio, refFim });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -1189,6 +1189,7 @@ export function CamadaCobra({ refInicio, refFim, refBotaoDestino }: CamadaCobraP
 
     function desenhar(): void {
       if (!canvas) return;
+      const buffer = bufferRef.current;
       contexto?.clearRect(0, 0, canvas.width, canvas.height);
       if (!contexto || buffer.quantidadeEscrita < 2) {
         return;
@@ -1220,7 +1221,7 @@ export function CamadaCobra({ refInicio, refFim, refBotaoDestino }: CamadaCobraP
       gsap.ticker.remove(desenhar);
       window.removeEventListener('resize', redimensionar);
     };
-  }, [buffer]);
+  }, [bufferRef]);
 
   useEffect(() => {
     const elo = eloRef.current;
