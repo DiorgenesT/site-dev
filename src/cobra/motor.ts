@@ -27,7 +27,10 @@ export function inserirPosicao(buffer: BufferCircular, ponto: Ponto): void {
   buffer.quantidadeEscrita = Math.min(buffer.quantidadeEscrita + 1, buffer.tamanho);
 }
 
-export function obterPosicao(buffer: BufferCircular, deslocamento: number): Ponto {
+// Aceita um Ponto de saida opcional para escrever por referencia: chamado varias
+// vezes por frame dentro do loop de desenho, alocar objeto novo a cada chamada
+// violaria o contrato de "zero alocacao dentro do rAF".
+export function obterPosicao(buffer: BufferCircular, deslocamento: number, saida?: Ponto): Ponto {
   const indice =
     (((buffer.indiceMaisRecente - deslocamento) % buffer.tamanho) + buffer.tamanho) %
     buffer.tamanho;
@@ -36,7 +39,10 @@ export function obterPosicao(buffer: BufferCircular, deslocamento: number): Pont
   if (x === undefined || y === undefined) {
     throw new Error(`indice de buffer fora da faixa: ${indice}`);
   }
-  return { x, y };
+  const destino = saida ?? { x: 0, y: 0 };
+  destino.x = x;
+  destino.y = y;
+  return destino;
 }
 
 export const PASSOS_POR_SEGUNDO = 12;

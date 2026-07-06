@@ -60,7 +60,7 @@ export function amostrarCurvaUniforme(waypoints: readonly Ponto[], resolucao: nu
 }
 
 export interface Trajetoria {
-  amostrar(progresso: number): Ponto;
+  amostrar(progresso: number, saida?: Ponto): Ponto;
 }
 
 function distancia(a: Ponto, b: Ponto): number {
@@ -80,9 +80,16 @@ export function construirTrajetoria(waypoints: readonly Ponto[]): Trajetoria {
 
   const comprimentoTotal = comprimentosAcumulados[comprimentosAcumulados.length - 1] ?? 0;
 
-  function amostrar(progresso: number): Ponto {
+  // Saida opcional por referencia: aoTick (12x/s) e potencialmente o loop de
+  // desenho reutilizam o mesmo Ponto para nao alocar dentro de um loop de animacao.
+  function amostrar(progresso: number, saida?: Ponto): Ponto {
+    const destino = saida ?? { x: 0, y: 0 };
+
     if (comprimentoTotal === 0) {
-      return obterPontoOuFalhar(amostras, 0);
+      const primeira = obterPontoOuFalhar(amostras, 0);
+      destino.x = primeira.x;
+      destino.y = primeira.y;
+      return destino;
     }
 
     const progressoLimitado = Math.min(Math.max(progresso, 0), 1);
@@ -107,10 +114,9 @@ export function construirTrajetoria(waypoints: readonly Ponto[]): Trajetoria {
     const pontoInicio = obterPontoOuFalhar(amostras, indice);
     const pontoFim = obterPontoOuFalhar(amostras, indiceSeguinte);
 
-    return {
-      x: pontoInicio.x + (pontoFim.x - pontoInicio.x) * fracao,
-      y: pontoInicio.y + (pontoFim.y - pontoInicio.y) * fracao,
-    };
+    destino.x = pontoInicio.x + (pontoFim.x - pontoInicio.x) * fracao;
+    destino.y = pontoInicio.y + (pontoFim.y - pontoInicio.y) * fracao;
+    return destino;
   }
 
   return { amostrar };
