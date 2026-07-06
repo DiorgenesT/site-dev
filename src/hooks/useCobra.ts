@@ -36,7 +36,13 @@ function elementoParaPonto(elemento: HTMLElement): Ponto {
 
 export function useCobra({ refInicio, refFim }: OpcoesCobra): EstadoCobra {
   const bufferRef = useRef<BufferCircular>(criarBufferCircular(TAMANHO_BUFFER_CORPO));
-  const [fator, setFator] = useState(0);
+  // Fallback estatico funcional (contrato tecnico da cobra, ponto 7): com
+  // reduced-motion, o fator de docking ja nasce em 1 (em vez de 0), fazendo o
+  // botao real de CTA ficar visivel e o canvas invisivel desde o primeiro
+  // render, sem depender de nenhuma animacao ou de setState dentro do efeito.
+  const [fator, setFator] = useState(() =>
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1 : 0,
+  );
 
   useEffect(() => {
     const prefereReduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
