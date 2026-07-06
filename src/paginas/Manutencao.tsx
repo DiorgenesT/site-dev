@@ -6,18 +6,22 @@ import { PapelRasgado } from '../componentes/PapelRasgado';
 
 export default function Manutencao() {
   return (
-    <main className="min-h-screen bg-branco-papel text-preto-tinta p-8 textura-granulada flex flex-col justify-center items-start">
-      <NotaDeResgate texto="DG" />
-      <div className="mt-4">
+    <main className="min-h-screen bg-branco-papel text-preto-tinta p-8 textura-granulada flex flex-col justify-center items-center text-center gap-6">
+      <div className="text-5xl md:text-7xl">
+        <NotaDeResgate texto="DG" />
+      </div>
+      <div className="text-xl md:text-2xl">
         <FitaAdesiva indice={1}>Python & AI Engineer</FitaAdesiva>
       </div>
-      <div className="mt-4">
-        <Adesivo indice={0}>Zine em producao, novas paginas em breve</Adesivo>
+      <div className="text-lg md:text-xl max-w-md">
+        <Adesivo indice={0}>Site em construcao, paginas novas em breve</Adesivo>
       </div>
-      <div className="mt-4">
+      <div className="text-lg md:text-xl">
         <Carimbo indice={4}>EM BREVE</Carimbo>
       </div>
-      <PapelRasgado />
+      <div className="w-full max-w-xl">
+        <PapelRasgado />
+      </div>
     </main>
   );
 }
