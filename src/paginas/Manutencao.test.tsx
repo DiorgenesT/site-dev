@@ -1,0 +1,13 @@
+import { describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import Manutencao from './Manutencao';
+
+describe('Manutencao', () => {
+  it('renderiza a identidade e a mensagem de site em producao', () => {
+    render(<Manutencao />);
+    expect(screen.getByLabelText('DG')).toBeInTheDocument();
+    expect(screen.getByText('Python & AI Engineer')).toBeInTheDocument();
+    expect(screen.getByText('Zine em producao, novas paginas em breve')).toBeInTheDocument();
+    expect(screen.getByText('EM BREVE')).toBeInTheDocument();
+  });
+});
