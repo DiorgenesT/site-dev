@@ -28,7 +28,7 @@ export default function App() {
 
       <div ref={refJornada}>
         <div ref={refInicio} aria-hidden="true" />
-        <div style={{ height: '150vh' }} />
+        <div aria-hidden="true" style={{ height: '150vh' }} />
         <div ref={refFim} className="flex justify-center py-16">
           <button
             ref={refBotaoDestino}
