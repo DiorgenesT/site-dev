@@ -38,3 +38,23 @@ export function obterPosicao(buffer: BufferCircular, deslocamento: number): Pont
   }
   return { x, y };
 }
+
+export const PASSOS_POR_SEGUNDO = 12;
+
+export interface Quantizador {
+  readonly intervaloMs: number;
+  tempoAcumulado: number;
+}
+
+export function criarQuantizador(passosPorSegundo: number): Quantizador {
+  return { intervaloMs: 1000 / passosPorSegundo, tempoAcumulado: 0 };
+}
+
+export function avancarQuantizador(quantizador: Quantizador, deltaMs: number): boolean {
+  quantizador.tempoAcumulado += deltaMs;
+  if (quantizador.tempoAcumulado >= quantizador.intervaloMs) {
+    quantizador.tempoAcumulado -= quantizador.intervaloMs;
+    return true;
+  }
+  return false;
+}

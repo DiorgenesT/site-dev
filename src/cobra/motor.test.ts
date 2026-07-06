@@ -1,5 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import { criarBufferCircular, inserirPosicao, obterPosicao, TAMANHO_BUFFER_CORPO } from './motor';
+import {
+  criarBufferCircular,
+  inserirPosicao,
+  obterPosicao,
+  TAMANHO_BUFFER_CORPO,
+  criarQuantizador,
+  avancarQuantizador,
+  PASSOS_POR_SEGUNDO,
+} from './motor';
 
 describe('buffer circular', () => {
   it('TAMANHO_BUFFER_CORPO e 12', () => {
@@ -43,5 +51,34 @@ describe('buffer circular', () => {
     expect(buffer.quantidadeEscrita).toBe(2);
     inserirPosicao(buffer, { x: 3, y: 3 });
     expect(buffer.quantidadeEscrita).toBe(2);
+  });
+});
+
+describe('quantizador stop motion', () => {
+  it('PASSOS_POR_SEGUNDO e 12', () => {
+    expect(PASSOS_POR_SEGUNDO).toBe(12);
+  });
+
+  it('intervaloMs e aproximadamente 83.33ms para 12 passos por segundo', () => {
+    const quantizador = criarQuantizador(12);
+    expect(quantizador.intervaloMs).toBeCloseTo(1000 / 12, 5);
+  });
+
+  it('nao avanca antes de acumular o intervalo completo', () => {
+    const quantizador = criarQuantizador(12);
+    expect(avancarQuantizador(quantizador, 16)).toBe(false);
+    expect(avancarQuantizador(quantizador, 16)).toBe(false);
+  });
+
+  it('avanca exatamente quando o tempo acumulado atinge o intervalo', () => {
+    const quantizador = criarQuantizador(12); // intervalo ~83.33ms
+    avancarQuantizador(quantizador, 80);
+    expect(avancarQuantizador(quantizador, 4)).toBe(true);
+  });
+
+  it('preserva o resto do tempo acumulado apos avancar (nao perde precisao)', () => {
+    const quantizador = criarQuantizador(10); // intervalo exato de 100ms
+    avancarQuantizador(quantizador, 120);
+    expect(quantizador.tempoAcumulado).toBeCloseTo(20, 5);
   });
 });
