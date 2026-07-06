@@ -31,6 +31,16 @@ describe('buffer circular', () => {
     expect(anterior).toEqual({ x: 1, y: 1 });
   });
 
+  it('obterPosicao escreve no objeto de saida fornecido em vez de alocar um novo', () => {
+    const buffer = criarBufferCircular(4);
+    inserirPosicao(buffer, { x: 1, y: 1 });
+    inserirPosicao(buffer, { x: 2, y: 2 });
+    const saida = { x: 0, y: 0 };
+    const resultado = obterPosicao(buffer, 0, saida);
+    expect(resultado).toBe(saida);
+    expect(saida).toEqual({ x: 2, y: 2 });
+  });
+
   it('faz wraparound corretamente ao exceder o tamanho do buffer', () => {
     const buffer = criarBufferCircular(3);
     inserirPosicao(buffer, { x: 1, y: 1 });

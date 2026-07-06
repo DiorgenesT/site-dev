@@ -102,6 +102,18 @@ describe('construirTrajetoria', () => {
     expect(meio.x).toBeLessThan(60);
   });
 
+  it('amostrar escreve no objeto de saida fornecido em vez de alocar um novo', () => {
+    const trajetoria = construirTrajetoria([
+      { x: 0, y: 0 },
+      { x: 100, y: 0 },
+    ]);
+    const saida = { x: -1, y: -1 };
+    const resultado = trajetoria.amostrar(1, saida);
+    expect(resultado).toBe(saida);
+    expect(saida.x).toBeCloseTo(100, 1);
+    expect(saida.y).toBeCloseTo(0, 1);
+  });
+
   it('e monotonica em x para waypoints colineares crescentes', () => {
     const trajetoria = construirTrajetoria([
       { x: 0, y: 0 },

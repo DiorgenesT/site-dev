@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import type { RefObject } from 'react';
 import { useCobra } from '../hooks/useCobra';
 import { obterPosicao, PASSADAS_TRACO } from '../cobra/motor';
+import type { Ponto } from '../cobra/tipos';
 import { carregarGsap, Flip } from '../lib/gsap';
 
 interface CamadaCobraProps {
@@ -16,11 +17,18 @@ export function CamadaCobra({ refInicio, refFim, refJornada, refBotaoDestino }: 
   const eloRef = useRef<HTMLDivElement | null>(null);
   // Flip.from() retorna uma Timeline (nao um Tween) - confirmado em gsap/types/Flip.d.ts.
   const flipTimelineRef = useRef<gsap.core.Timeline | null>(null);
-  const { bufferRef, fatorDocking } = useCobra({ refInicio, refFim, refJornada });
+  const { bufferRef, fatorDocking, scrollRef, cobraAtiva } = useCobra({
+    refInicio,
+    refFim,
+    refJornada,
+  });
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) {
+    // Contrato pontos 7 e 8: sem reduced-motion ativo ou com a jornada fora de
+    // vista (aba oculta ou secao fora da tela), o ticker de desenho nem e
+    // registrado, entao o trabalho mais caro (clearRect + stroke) para por completo.
+    if (!canvas || !cobraAtiva) {
       return undefined;
     }
     const contexto = canvas.getContext('2d');
@@ -38,13 +46,18 @@ export function CamadaCobra({ refInicio, refFim, refJornada, refBotaoDestino }: 
     redimensionar();
     window.addEventListener('resize', redimensionar);
 
+    // Ponto reutilizado a cada chamada de obterPosicao dentro do loop: o
+    // contrato proibe alocacao dentro do rAF de desenho.
+    const pontoReutilizavel: Ponto = { x: 0, y: 0 };
+
     function desenhar(): void {
       if (!canvas || !contexto) {
         return;
       }
       const buffer = bufferRef.current;
+      const scroll = scrollRef.current;
       contexto.clearRect(0, 0, canvas.width, canvas.height);
-      if (!buffer || buffer.quantidadeEscrita < 2) {
+      if (!buffer || buffer.quantidadeEscrita < 2 || !scroll) {
         return;
       }
       for (const passada of PASSADAS_TRACO) {
@@ -54,9 +67,9 @@ export function CamadaCobra({ refInicio, refFim, refJornada, refBotaoDestino }: 
         contexto.lineCap = 'round';
         contexto.lineJoin = 'round';
         for (let i = 0; i < buffer.quantidadeEscrita; i += 1) {
-          const ponto = obterPosicao(buffer, i);
-          const x = ponto.x + passada.deslocamentoX - window.scrollX;
-          const y = ponto.y + passada.deslocamentoY - window.scrollY;
+          obterPosicao(buffer, i, pontoReutilizavel);
+          const x = pontoReutilizavel.x + passada.deslocamentoX - scroll.x;
+          const y = pontoReutilizavel.y + passada.deslocamentoY - scroll.y;
           if (i === 0) {
             contexto.moveTo(x, y);
           } else {
@@ -74,7 +87,7 @@ export function CamadaCobra({ refInicio, refFim, refJornada, refBotaoDestino }: 
       gsap.ticker.remove(desenhar);
       window.removeEventListener('resize', redimensionar);
     };
-  }, [bufferRef]);
+  }, [bufferRef, scrollRef, cobraAtiva]);
 
   useEffect(() => {
     const elo = eloRef.current;
