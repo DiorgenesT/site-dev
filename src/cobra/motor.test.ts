@@ -7,6 +7,7 @@ import {
   criarQuantizador,
   avancarQuantizador,
   PASSOS_POR_SEGUNDO,
+  PASSADAS_TRACO,
 } from './motor';
 
 describe('buffer circular', () => {
@@ -80,5 +81,28 @@ describe('quantizador stop motion', () => {
     const quantizador = criarQuantizador(10); // intervalo exato de 100ms
     avancarQuantizador(quantizador, 120);
     expect(quantizador.tempoAcumulado).toBeCloseTo(20, 5);
+  });
+});
+
+describe('PASSADAS_TRACO', () => {
+  it('tem exatamente 3 passadas', () => {
+    expect(PASSADAS_TRACO).toHaveLength(3);
+  });
+
+  it('toda passada tem espessura positiva', () => {
+    for (const passada of PASSADAS_TRACO) {
+      expect(passada.espessura).toBeGreaterThan(0);
+    }
+  });
+
+  it('as passadas tem deslocamentos distintos entre si (nao sao identicas)', () => {
+    const chaves = PASSADAS_TRACO.map((p) => `${p.deslocamentoX},${p.deslocamentoY}`);
+    const unicas = new Set(chaves);
+    expect(unicas.size).toBe(PASSADAS_TRACO.length);
+  });
+
+  it('e uma tabela fixa e deterministica (mesma referencia sempre)', () => {
+    // reimportar nao muda os valores, e uma constante de modulo, nunca gerada por Math.random
+    expect(PASSADAS_TRACO[0]).toEqual({ deslocamentoX: 0, deslocamentoY: 0, espessura: 6 });
   });
 });

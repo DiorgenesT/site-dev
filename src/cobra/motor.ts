@@ -58,3 +58,17 @@ export function avancarQuantizador(quantizador: Quantizador, deltaMs: number): b
   }
   return false;
 }
+
+export interface PassadaTraco {
+  readonly deslocamentoX: number;
+  readonly deslocamentoY: number;
+  readonly espessura: number;
+}
+
+// Tabela fixa gerada uma unica vez, 3 passadas deterministas (nunca Math.random),
+// estilo "rabisco nervoso": tres passadas levemente desalinhadas sobrepostas.
+export const PASSADAS_TRACO: readonly PassadaTraco[] = [
+  { deslocamentoX: 0, deslocamentoY: 0, espessura: 6 },
+  { deslocamentoX: 1.5, deslocamentoY: -1, espessura: 4 },
+  { deslocamentoX: -1, deslocamentoY: 1.2, espessura: 3 },
+] as const;
