@@ -8,4 +8,9 @@ describe('App', () => {
     expect(screen.getByLabelText('DG')).toBeInTheDocument();
     expect(screen.getByText('Python & AI Engineer')).toBeInTheDocument();
   });
+
+  it('renderiza o botao de destino da cobra', () => {
+    render(<App />);
+    expect(screen.getByRole('button', { name: 'Fale comigo' })).toBeInTheDocument();
+  });
 });

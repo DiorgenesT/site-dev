@@ -7,15 +7,16 @@ import { carregarGsap, Flip } from '../lib/gsap';
 interface CamadaCobraProps {
   refInicio: RefObject<HTMLElement | null>;
   refFim: RefObject<HTMLElement | null>;
+  refJornada: RefObject<HTMLElement | null>;
   refBotaoDestino: RefObject<HTMLElement | null>;
 }
 
-export function CamadaCobra({ refInicio, refFim, refBotaoDestino }: CamadaCobraProps) {
+export function CamadaCobra({ refInicio, refFim, refJornada, refBotaoDestino }: CamadaCobraProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const eloRef = useRef<HTMLDivElement | null>(null);
   // Flip.from() retorna uma Timeline (nao um Tween) - confirmado em gsap/types/Flip.d.ts.
   const flipTimelineRef = useRef<gsap.core.Timeline | null>(null);
-  const { bufferRef, fatorDocking } = useCobra({ refInicio, refFim });
+  const { bufferRef, fatorDocking } = useCobra({ refInicio, refFim, refJornada });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -82,6 +83,11 @@ export function CamadaCobra({ refInicio, refFim, refBotaoDestino }: CamadaCobraP
       return;
     }
 
+    // carregarGsap() registra o plugin Flip antes de qualquer uso: nao depender
+    // do efeito do canvas para isso, pois ele pode retornar cedo (ex.: contexto
+    // 2d indisponivel) e deixar o Flip sem registro, quebrando Flip.getState.
+    const gsap = carregarGsap();
+
     if (!flipTimelineRef.current) {
       const estado = Flip.getState(elo);
       flipTimelineRef.current = Flip.from(estado, {
@@ -95,7 +101,6 @@ export function CamadaCobra({ refInicio, refFim, refBotaoDestino }: CamadaCobraP
 
     // gsap.set (nao atribuicao direta a .style) para nao mutar diretamente um
     // elemento DOM alcancado por uma ref recebida via prop (react-hooks/immutability).
-    const gsap = carregarGsap();
     const canvas = canvasRef.current;
     if (canvas) {
       gsap.set(canvas, { opacity: 1 - fatorDocking });
