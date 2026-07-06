@@ -15,8 +15,9 @@ describe('useCobra', () => {
     // ficaria preso em 0 e o CamadaCobra deixaria o botao real de CTA invisivel.
     const refInicio = criarRef();
     const refFim = criarRef();
+    const refJornada = criarRef();
 
-    const { result } = renderHook(() => useCobra({ refInicio, refFim }));
+    const { result } = renderHook(() => useCobra({ refInicio, refFim, refJornada }));
 
     expect(result.current.fatorDocking).toBe(1);
   });

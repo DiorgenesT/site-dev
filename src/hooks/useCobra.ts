@@ -19,6 +19,7 @@ import { iniciarMovimento, pararMovimento } from '../lib/movimento';
 interface OpcoesCobra {
   refInicio: RefObject<HTMLElement | null>;
   refFim: RefObject<HTMLElement | null>;
+  refJornada: RefObject<HTMLElement | null>;
 }
 
 interface EstadoCobra {
@@ -34,7 +35,7 @@ function elementoParaPonto(elemento: HTMLElement): Ponto {
   };
 }
 
-export function useCobra({ refInicio, refFim }: OpcoesCobra): EstadoCobra {
+export function useCobra({ refInicio, refFim, refJornada }: OpcoesCobra): EstadoCobra {
   const bufferRef = useRef<BufferCircular>(criarBufferCircular(TAMANHO_BUFFER_CORPO));
   // Fallback estatico funcional (contrato tecnico da cobra, ponto 7): com
   // reduced-motion, o fator de docking ja nasce em 1 (em vez de 0), fazendo o
@@ -52,7 +53,8 @@ export function useCobra({ refInicio, refFim }: OpcoesCobra): EstadoCobra {
 
     const elementoInicio = refInicio.current;
     const elementoFim = refFim.current;
-    if (!elementoInicio || !elementoFim) {
+    const elementoJornada = refJornada.current;
+    if (!elementoInicio || !elementoFim || !elementoJornada) {
       return undefined;
     }
 
@@ -98,6 +100,10 @@ export function useCobra({ refInicio, refFim }: OpcoesCobra): EstadoCobra {
     }
     document.addEventListener('visibilitychange', aoMudarVisibilidadeAba);
 
+    // Observa o container que envolve toda a jornada (inicio ao fim), nao so a
+    // ancora de inicio: assim visivelTela so vira false quando a jornada inteira
+    // sai da tela, nao assim que o usuario rola um pouco alem da ancora inicial
+    // (que fica perto do topo e sairia de vista quase de imediato).
     const observadorIntersecao = new IntersectionObserver(
       (entradas) => {
         const entrada = entradas[0];
@@ -105,7 +111,7 @@ export function useCobra({ refInicio, refFim }: OpcoesCobra): EstadoCobra {
       },
       { threshold: 0 },
     );
-    observadorIntersecao.observe(elementoInicio);
+    observadorIntersecao.observe(elementoJornada);
 
     function aoTick(_tempo: number, deltaMs: number): void {
       if (!visivelAba || !visivelTela) {
@@ -131,7 +137,7 @@ export function useCobra({ refInicio, refFim }: OpcoesCobra): EstadoCobra {
       document.removeEventListener('visibilitychange', aoMudarVisibilidadeAba);
       clearTimeout(resizeTimeoutId);
     };
-  }, [refInicio, refFim]);
+  }, [refInicio, refFim, refJornada]);
 
   return { bufferRef, fatorDocking: fator };
 }
