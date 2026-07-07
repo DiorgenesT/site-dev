@@ -1,14 +1,17 @@
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { CamadaCobra } from '../componentes/CamadaCobra';
 
 export default function Playground() {
   const refInicio = useRef<HTMLDivElement>(null);
   const refFim = useRef<HTMLDivElement>(null);
   const refJornada = useRef<HTMLDivElement>(null);
+  const refBotaoOrigem = useRef<HTMLButtonElement>(null);
   const refBotaoDestino = useRef<HTMLButtonElement>(null);
   const [velocidade, setVelocidade] = useState(150);
   const [espessura, setEspessura] = useState(6);
   const [quantizacao, setQuantizacao] = useState(12);
+
+  const refsSecoes = useMemo(() => [refInicio, refFim], [refInicio, refFim]);
 
   return (
     <main className="min-h-screen bg-branco-papel text-preto-tinta p-8">
@@ -55,23 +58,31 @@ export default function Playground() {
       </div>
 
       <div ref={refJornada}>
-        <div ref={refInicio} aria-hidden="true" />
+        <div ref={refInicio} className="flex justify-center py-16">
+          <button
+            ref={refBotaoOrigem}
+            type="button"
+            className="bg-vermelho-punk text-branco-papel px-6 py-3 font-bold uppercase tracking-widest"
+          >
+            CTA de origem (teste)
+          </button>
+        </div>
         <div aria-hidden="true" style={{ height: `${velocidade}vh` }} />
         <div ref={refFim} className="flex justify-center py-16">
           <button
             ref={refBotaoDestino}
             type="button"
-            className="bg-vermelho-punk text-branco-papel px-6 py-3 font-bold uppercase tracking-widest opacity-0"
+            className="bg-vermelho-punk text-branco-papel px-6 py-3 font-bold uppercase tracking-widest"
           >
-            CTA de teste
+            CTA de destino (teste)
           </button>
         </div>
       </div>
 
       <CamadaCobra
-        refInicio={refInicio}
-        refFim={refFim}
+        refsSecoes={refsSecoes}
         refJornada={refJornada}
+        refBotaoOrigem={refBotaoOrigem}
         refBotaoDestino={refBotaoDestino}
       />
     </main>

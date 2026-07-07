@@ -6,20 +6,26 @@ import type { Ponto } from '../cobra/tipos';
 import { carregarGsap, Flip } from '../lib/gsap';
 
 interface CamadaCobraProps {
-  refInicio: RefObject<HTMLElement | null>;
-  refFim: RefObject<HTMLElement | null>;
+  refsSecoes: readonly RefObject<HTMLElement | null>[];
   refJornada: RefObject<HTMLElement | null>;
+  refBotaoOrigem: RefObject<HTMLElement | null>;
   refBotaoDestino: RefObject<HTMLElement | null>;
 }
 
-export function CamadaCobra({ refInicio, refFim, refJornada, refBotaoDestino }: CamadaCobraProps) {
+export function CamadaCobra({
+  refsSecoes,
+  refJornada,
+  refBotaoOrigem,
+  refBotaoDestino,
+}: CamadaCobraProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const eloRef = useRef<HTMLDivElement | null>(null);
+  const eloOrigemRef = useRef<HTMLDivElement | null>(null);
+  const eloDestinoRef = useRef<HTMLDivElement | null>(null);
   // Flip.from() retorna uma Timeline (nao um Tween) - confirmado em gsap/types/Flip.d.ts.
-  const flipTimelineRef = useRef<gsap.core.Timeline | null>(null);
-  const { bufferRef, fatorDocking, scrollRef, cobraAtiva } = useCobra({
-    refInicio,
-    refFim,
+  const flipOrigemRef = useRef<gsap.core.Timeline | null>(null);
+  const flipDestinoRef = useRef<gsap.core.Timeline | null>(null);
+  const { bufferRef, fatorDocking, fatorDesmonte, scrollRef, cobraAtiva } = useCobra({
+    refsSecoes,
     refJornada,
   });
 
@@ -90,36 +96,50 @@ export function CamadaCobra({ refInicio, refFim, refJornada, refBotaoDestino }: 
   }, [bufferRef, scrollRef, cobraAtiva]);
 
   useEffect(() => {
-    const elo = eloRef.current;
-    const botao = refBotaoDestino.current;
-    if (!elo || !botao) {
-      return;
+    const gsapInstancia = carregarGsap();
+
+    const eloOrigem = eloOrigemRef.current;
+    const botaoOrigem = refBotaoOrigem.current;
+    if (eloOrigem && botaoOrigem) {
+      if (!flipOrigemRef.current) {
+        const estado = Flip.getState(eloOrigem);
+        flipOrigemRef.current = Flip.from(estado, {
+          targets: botaoOrigem,
+          paused: true,
+          absolute: true,
+        });
+      }
+      // Desmonte e o inverso do docking: fatorDesmonte comeca em 1 (cobra ainda
+      // colada na origem, progresso 0 do Flip = forma do elo) e cai a 0 (cobra
+      // solta, progresso 1 do Flip = forma natural do botao).
+      flipOrigemRef.current.progress(1 - fatorDesmonte);
     }
 
-    // carregarGsap() registra o plugin Flip antes de qualquer uso: nao depender
-    // do efeito do canvas para isso, pois ele pode retornar cedo (ex.: contexto
-    // 2d indisponivel) e deixar o Flip sem registro, quebrando Flip.getState.
-    const gsap = carregarGsap();
-
-    if (!flipTimelineRef.current) {
-      const estado = Flip.getState(elo);
-      flipTimelineRef.current = Flip.from(estado, {
-        targets: botao,
-        paused: true,
-        absolute: true,
-      });
+    const eloDestino = eloDestinoRef.current;
+    const botaoDestino = refBotaoDestino.current;
+    if (eloDestino && botaoDestino) {
+      if (!flipDestinoRef.current) {
+        const estado = Flip.getState(eloDestino);
+        flipDestinoRef.current = Flip.from(estado, {
+          targets: botaoDestino,
+          paused: true,
+          absolute: true,
+        });
+      }
+      flipDestinoRef.current.progress(fatorDocking);
     }
 
-    flipTimelineRef.current.progress(fatorDocking);
-
-    // gsap.set (nao atribuicao direta a .style) para nao mutar diretamente um
-    // elemento DOM alcancado por uma ref recebida via prop (react-hooks/immutability).
+    // Correcao de acessibilidade (spec Fase 2, secao 3.3): os botoes reais
+    // nunca tem a propria opacidade amarrada a fatorDocking/fatorDesmonte - eles
+    // ficam sempre visiveis e focaveis, com o estilo final, desde o primeiro
+    // render. So a camada canvas (decorativa, aria-hidden) anima opacidade: 1
+    // no meio da jornada (cobra visivel viajando), 0 perto da origem (ainda nao
+    // desmontou) ou do destino (ja fez o docking).
     const canvas = canvasRef.current;
     if (canvas) {
-      gsap.set(canvas, { opacity: 1 - fatorDocking });
+      gsapInstancia.set(canvas, { opacity: 1 - fatorDesmonte - fatorDocking });
     }
-    gsap.set(botao, { opacity: fatorDocking });
-  }, [fatorDocking, refBotaoDestino]);
+  }, [fatorDocking, fatorDesmonte, refBotaoOrigem, refBotaoDestino]);
 
   return (
     <>
@@ -129,7 +149,12 @@ export function CamadaCobra({ refInicio, refFim, refJornada, refBotaoDestino }: 
         className="pointer-events-none fixed inset-0 z-40"
       />
       <div
-        ref={eloRef}
+        ref={eloOrigemRef}
+        aria-hidden="true"
+        className="pointer-events-none fixed h-10 w-10 opacity-0"
+      />
+      <div
+        ref={eloDestinoRef}
         aria-hidden="true"
         className="pointer-events-none fixed h-10 w-10 opacity-0"
       />
