@@ -11,20 +11,27 @@ import {
   PASSOS_POR_SEGUNDO,
   type BufferCircular,
 } from '../cobra/motor';
-import { fatorDocking, INICIO_ZONA_DOCKING } from '../cobra/docking';
+import {
+  fatorDocking,
+  INICIO_ZONA_DOCKING,
+  fatorDesmonte,
+  FIM_ZONA_DESMONTE,
+} from '../cobra/docking';
 import type { Ponto } from '../cobra/tipos';
 import { carregarGsap, ScrollTrigger } from '../lib/gsap';
 import { iniciarMovimento, pararMovimento } from '../lib/movimento';
 
 interface OpcoesCobra {
-  refInicio: RefObject<HTMLElement | null>;
-  refFim: RefObject<HTMLElement | null>;
+  // Uma ancora por secao, na ordem em que aparecem na pagina (Hero primeiro,
+  // Contato por ultimo). A trajetoria da cobra passa por todas elas.
+  refsSecoes: readonly RefObject<HTMLElement | null>[];
   refJornada: RefObject<HTMLElement | null>;
 }
 
 interface EstadoCobra {
   bufferRef: RefObject<BufferCircular>;
   fatorDocking: number;
+  fatorDesmonte: number;
   scrollRef: RefObject<Ponto>;
   cobraAtiva: boolean;
 }
@@ -37,7 +44,7 @@ function elementoParaPonto(elemento: HTMLElement): Ponto {
   };
 }
 
-export function useCobra({ refInicio, refFim, refJornada }: OpcoesCobra): EstadoCobra {
+export function useCobra({ refsSecoes, refJornada }: OpcoesCobra): EstadoCobra {
   const bufferRef = useRef<BufferCircular>(criarBufferCircular(TAMANHO_BUFFER_CORPO));
   // Ponto reutilizado pela amostragem quantizada (12x/s): evita alocar um Ponto
   // novo por tick, na mesma linha do buffer circular do corpo.
@@ -51,11 +58,13 @@ export function useCobra({ refInicio, refFim, refJornada }: OpcoesCobra): Estado
   const [reducedMotion] = useState(
     () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
   );
-  // Fallback estatico funcional (contrato tecnico da cobra, ponto 7): com
-  // reduced-motion, o fator de docking ja nasce em 1 (em vez de 0), fazendo o
-  // botao real de CTA ficar visivel e o canvas invisivel desde o primeiro
-  // render, sem depender de nenhuma animacao ou de setState dentro do efeito.
-  const [fator, setFator] = useState(() => (reducedMotion ? 1 : 0));
+  // Os botoes reais nao dependem mais destes valores para ficarem visiveis
+  // (correcao de acessibilidade, spec Fase 2 secao 3.3) - por isso os dois
+  // fatores comecam neutros (0), sem precisar de caso especial para
+  // reduced-motion. O fallback estatico funcional agora vem inteiramente de
+  // cobraAtiva=false, que desliga o desenho decorativo da cobra.
+  const [fatorDockingAtual, setFatorDockingAtual] = useState(0);
+  const [fatorDesmonteAtual, setFatorDesmonteAtual] = useState(0);
   // Visibilidade combinada (aba em foco e secao da jornada na tela). Comeca
   // true: o efeito abaixo corrige para o valor real assim que os observers
   // disparam, e com reduced-motion o efeito nem chega a rodar.
@@ -66,17 +75,19 @@ export function useCobra({ refInicio, refFim, refJornada }: OpcoesCobra): Estado
       return undefined;
     }
 
-    const elementoInicio = refInicio.current;
-    const elementoFim = refFim.current;
+    const elementosSecoes = refsSecoes.map((ref) => ref.current);
     const elementoJornada = refJornada.current;
-    if (!elementoInicio || !elementoFim || !elementoJornada) {
+    if (elementosSecoes.some((elemento) => elemento === null) || !elementoJornada) {
+      return undefined;
+    }
+    const elementosValidados = elementosSecoes as HTMLElement[];
+    const elementoInicio = elementosValidados[0];
+    const elementoFim = elementosValidados[elementosValidados.length - 1];
+    if (!elementoInicio || !elementoFim) {
       return undefined;
     }
 
-    let trajetoria: Trajetoria = construirTrajetoria([
-      elementoParaPonto(elementoInicio),
-      elementoParaPonto(elementoFim),
-    ]);
+    let trajetoria: Trajetoria = construirTrajetoria(elementosValidados.map(elementoParaPonto));
     const quantizador = criarQuantizador(PASSOS_POR_SEGUNDO);
     let progressoAtual = 0;
     let visivelAba = document.visibilityState === 'visible';
@@ -103,14 +114,11 @@ export function useCobra({ refInicio, refFim, refJornada }: OpcoesCobra): Estado
 
     let resizeTimeoutId: ReturnType<typeof setTimeout> | undefined;
     // Arrow function (nao function declaration): preserva o estreitamento de tipo
-    // de elementoInicio/elementoFim (HTMLElement | null -> HTMLElement) dentro do closure.
+    // de elementosValidados dentro do closure.
     const aoRedimensionar = (): void => {
       clearTimeout(resizeTimeoutId);
       resizeTimeoutId = setTimeout(() => {
-        trajetoria = construirTrajetoria([
-          elementoParaPonto(elementoInicio),
-          elementoParaPonto(elementoFim),
-        ]);
+        trajetoria = construirTrajetoria(elementosValidados.map(elementoParaPonto));
         scrollRef.current.x = window.scrollX;
         scrollTrigger.refresh();
       }, 150);
@@ -126,8 +134,7 @@ export function useCobra({ refInicio, refFim, refJornada }: OpcoesCobra): Estado
 
     // Observa o container que envolve toda a jornada (inicio ao fim), nao so a
     // ancora de inicio: assim visivelTela so vira false quando a jornada inteira
-    // sai da tela, nao assim que o usuario rola um pouco alem da ancora inicial
-    // (que fica perto do topo e sairia de vista quase de imediato).
+    // sai da tela, nao assim que o usuario rola um pouco alem da ancora inicial.
     const observadorIntersecao = new IntersectionObserver(
       (entradas) => {
         const entrada = entradas[0];
@@ -146,7 +153,8 @@ export function useCobra({ refInicio, refFim, refJornada }: OpcoesCobra): Estado
       if (avancou) {
         trajetoria.amostrar(progressoAtual, amostraRef.current);
         inserirPosicao(bufferRef.current, amostraRef.current);
-        setFator(fatorDocking(progressoAtual, INICIO_ZONA_DOCKING));
+        setFatorDockingAtual(fatorDocking(progressoAtual, INICIO_ZONA_DOCKING));
+        setFatorDesmonteAtual(fatorDesmonte(progressoAtual, FIM_ZONA_DESMONTE));
       }
     }
 
@@ -162,11 +170,12 @@ export function useCobra({ refInicio, refFim, refJornada }: OpcoesCobra): Estado
       document.removeEventListener('visibilitychange', aoMudarVisibilidadeAba);
       clearTimeout(resizeTimeoutId);
     };
-  }, [refInicio, refFim, refJornada, reducedMotion]);
+  }, [refsSecoes, refJornada, reducedMotion]);
 
   return {
     bufferRef,
-    fatorDocking: fator,
+    fatorDocking: fatorDockingAtual,
+    fatorDesmonte: fatorDesmonteAtual,
     scrollRef,
     // Contrato pontos 7 e 8: cobra so desenha sem reduced-motion e com a
     // jornada visivel (aba em foco e secao na tela).

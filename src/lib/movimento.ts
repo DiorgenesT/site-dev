@@ -42,3 +42,16 @@ export function pararMovimento(): void {
     lenis = null;
   }
 }
+
+// Rolagem programatica (ex.: clique no CTA do Hero) usando a mesma instancia
+// de Lenis que ja controla o scroll, para nao dessincronizar scroll nativo e
+// scroll virtual. Se Lenis ainda nao foi criado (ex.: reduced-motion, onde
+// iniciarMovimento nunca chega a instancia-lo), cai para scrollIntoView nativo.
+export function rolarAte(alvo: HTMLElement): void {
+  if (lenis) {
+    lenis.scrollTo(alvo);
+    return;
+  }
+  const prefereReduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  alvo.scrollIntoView({ behavior: prefereReduzido ? 'auto' : 'smooth' });
+}

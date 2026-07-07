@@ -8,17 +8,20 @@ function criarRef(): RefObject<HTMLElement | null> {
 }
 
 describe('useCobra', () => {
-  it('nasce com fatorDocking=1 sob prefers-reduced-motion (fallback estatico funcional)', () => {
+  it('desliga a cobra por completo sob prefers-reduced-motion (fallback estatico funcional)', () => {
     // O stub global de matchMedia em src/testes/configurar.ts retorna matches:true
     // por padrao, simulando reduced-motion sempre ligado no ambiente de teste.
-    // Isso reproduz exatamente o bug corrigido: sem essa asserção, fatorDocking
-    // ficaria preso em 0 e o CamadaCobra deixaria o botao real de CTA invisivel.
-    const refInicio = criarRef();
-    const refFim = criarRef();
+    // Com a correcao de acessibilidade da Fase 2 (spec, secao 3.3), os botoes
+    // reais nao dependem mais de fatorDocking/fatorDesmonte para ficarem
+    // visiveis - a garantia do fallback agora e so cobraAtiva=false (o desenho
+    // da cobra nunca liga), nao mais um valor magico de fator.
+    const refsSecoes = [criarRef(), criarRef(), criarRef()];
     const refJornada = criarRef();
 
-    const { result } = renderHook(() => useCobra({ refInicio, refFim, refJornada }));
+    const { result } = renderHook(() => useCobra({ refsSecoes, refJornada }));
 
-    expect(result.current.fatorDocking).toBe(1);
+    expect(result.current.cobraAtiva).toBe(false);
+    expect(result.current.fatorDocking).toBe(0);
+    expect(result.current.fatorDesmonte).toBe(0);
   });
 });
