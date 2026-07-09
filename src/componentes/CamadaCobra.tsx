@@ -50,7 +50,16 @@ export function CamadaCobra({
       canvas.height = window.innerHeight;
     }
     redimensionar();
-    window.addEventListener('resize', redimensionar);
+
+    // Mesmo padrao de debounce de 150ms usado em useCobra.ts para o resize
+    // dos waypoints (contrato tecnico, CLAUDE.md).
+    let resizeTimeoutId: ReturnType<typeof setTimeout> | undefined;
+    const aoRedimensionar = (): void => {
+      clearTimeout(resizeTimeoutId);
+      resizeTimeoutId = setTimeout(redimensionar, 150);
+    };
+    const observadorRedimensionamento = new ResizeObserver(aoRedimensionar);
+    observadorRedimensionamento.observe(document.body);
 
     // Ponto reutilizado a cada chamada de obterPosicao dentro do loop: o
     // contrato proibe alocacao dentro do rAF de desenho.
@@ -91,7 +100,8 @@ export function CamadaCobra({
 
     return () => {
       gsap.ticker.remove(desenhar);
-      window.removeEventListener('resize', redimensionar);
+      observadorRedimensionamento.disconnect();
+      clearTimeout(resizeTimeoutId);
     };
   }, [bufferRef, scrollRef, cobraAtiva]);
 

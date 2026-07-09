@@ -9,7 +9,7 @@ export function Sobre({ refSecao }: SobreProps) {
   return (
     <section ref={refSecao} id="sobre" className="min-h-screen flex items-center gap-8 p-8">
       <div className="flex-1 text-lg leading-relaxed">
-        <h2 className="text-2xl font-bold mb-4">Sobre</h2>
+        <h2 className="text-2xl font-stencil mb-4">Sobre</h2>
         <p>
           Comecei gerenciando atendimento na Expresso Truck e na Monumental Assistencia 24hrs. Na
           Monumental, virei desenvolvedor Python: automatizei operacoes com LLMs e dashboards,

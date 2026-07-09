@@ -46,7 +46,7 @@ export function Projetos({ refSecao }: ProjetosProps) {
       id="projetos"
       className="min-h-screen flex flex-col items-center justify-center gap-8 p-8"
     >
-      <h2 className="text-2xl font-bold">Projetos</h2>
+      <h2 className="text-2xl font-stencil">Projetos</h2>
       <div className="grid gap-6 sm:grid-cols-2 max-w-4xl">
         {PROJETOS.map((projeto, indice) => (
           <article
@@ -54,7 +54,7 @@ export function Projetos({ refSecao }: ProjetosProps) {
             className="border-2 border-preto-tinta bg-branco-papel p-4"
             style={{ transform: `rotate(${obterRotacao(indice)}deg)` }}
           >
-            <h3 className="font-bold text-lg">{projeto.nome}</h3>
+            <h3 className="font-stencil text-lg">{projeto.nome}</h3>
             <p className="mt-2 text-sm">{projeto.descricao}</p>
             <p className="mt-2 text-xs uppercase tracking-wide">{projeto.stack}</p>
             {projeto.link ? (

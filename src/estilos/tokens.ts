@@ -5,12 +5,6 @@ export const cores = {
   amareloFita: '#e8b923',
 } as const;
 
-export const tipografia = {
-  maquinaEscrever: '"Special Elite", "Courier New", monospace',
-  recorteRevista: '"Anton", "Arial Narrow", sans-serif',
-  manuscrita: '"Caveat", "Segoe Print", cursive',
-} as const;
-
 // Tabela fixa, gerada uma vez e congelada. Nunca calcular rotacao com Math.random em render.
 export const ROTACOES = [-3, 2.5, -1.5, 4, -2.5, 1, 3.5, -4, 0.5, 2, -5, 5.5] as const;
 

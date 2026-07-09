@@ -14,13 +14,13 @@ export function Contato({ refSecao, refBotao }: ContatoProps) {
       id="contato"
       className="min-h-screen flex flex-col items-center justify-center text-center gap-6 p-8"
     >
-      <h2 className="text-2xl font-bold">Vamos conversar?</h2>
+      <h2 className="text-2xl font-stencil">Vamos conversar?</h2>
       <a
         ref={refBotao}
         href={LINK_WHATSAPP}
         target="_blank"
         rel="noopener noreferrer"
-        className="bg-vermelho-punk text-branco-papel px-6 py-3 font-bold uppercase tracking-widest"
+        className="bg-vermelho-punk text-branco-papel px-6 py-3 font-stencil uppercase tracking-widest"
       >
         Fale comigo
       </a>

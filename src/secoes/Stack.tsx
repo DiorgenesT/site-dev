@@ -28,7 +28,7 @@ export function Stack({ refSecao }: StackProps) {
       id="stack"
       className="min-h-screen flex flex-col items-center justify-center gap-8 p-8"
     >
-      <h2 className="text-2xl font-bold">Stack</h2>
+      <h2 className="text-2xl font-stencil">Stack</h2>
       <div className="flex flex-wrap justify-center gap-3 max-w-2xl">
         {TECNOLOGIAS.map((tecnologia, indice) => (
           <Adesivo key={tecnologia} indice={indice}>

@@ -1,6 +1,22 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
+import fontesUrl from './estilos/fontes.css?url';
+
+// As 3 familias customizadas (CLAUDE.md) tem fallback no @theme (index.css),
+// entao carregar essa folha via preload + troca pra stylesheet no onload
+// evita que o peso das fontes vire trabalho render-blocking do first paint.
+function carregarFontesAssincronamente(href: string): void {
+  const link = document.createElement('link');
+  link.rel = 'preload';
+  link.as = 'style';
+  link.href = href;
+  link.onload = () => {
+    link.rel = 'stylesheet';
+  };
+  document.head.appendChild(link);
+}
+carregarFontesAssincronamente(fontesUrl);
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
