@@ -11,7 +11,7 @@ export function FitaAdesiva({ indice, children }: FitaAdesivaProps) {
 
   return (
     <div
-      className="inline-block bg-amarelo-fita text-preto-tinta px-4 py-1 font-manuscrita opacity-90"
+      className="inline-block bg-amarelo-fita text-preto-tinta px-4 py-1 font-bold opacity-90"
       style={{ transform: `rotate(${rotacao}deg)` }}
     >
       {children}

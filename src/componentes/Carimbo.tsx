@@ -11,7 +11,7 @@ export function Carimbo({ indice, children }: CarimboProps) {
 
   return (
     <span
-      className="inline-block border-2 border-vermelho-punk text-vermelho-punk uppercase tracking-widest px-2 py-0.5 font-stencil"
+      className="inline-block border-2 border-vermelho-punk text-vermelho-punk uppercase tracking-widest px-2 py-0.5"
       style={{ transform: `rotate(${rotacao}deg)` }}
     >
       {children}

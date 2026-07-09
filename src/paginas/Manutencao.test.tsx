@@ -7,7 +7,7 @@ describe('Manutencao', () => {
     render(<Manutencao />);
     expect(screen.getByLabelText('DG')).toBeInTheDocument();
     expect(screen.getByText('Python & AI Engineer')).toBeInTheDocument();
-    expect(screen.getByText('Site em construcao, paginas novas em breve')).toBeInTheDocument();
+    expect(screen.getByText('Site em construção, páginas novas em breve')).toBeInTheDocument();
     expect(screen.getByText('EM BREVE')).toBeInTheDocument();
   });
 });
