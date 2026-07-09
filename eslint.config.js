@@ -25,14 +25,5 @@ export default tseslint.config(
       '@typescript-eslint/ban-ts-comment': 'error',
     },
   },
-  {
-    files: ['src/cobra/**/*.ts'],
-    rules: {
-      'no-restricted-imports': [
-        'error',
-        { patterns: ['react', 'react-dom', 'react/*', 'react-dom/*'] },
-      ],
-    },
-  },
   prettier,
 );

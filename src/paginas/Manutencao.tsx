@@ -14,7 +14,7 @@ export default function Manutencao() {
         <FitaAdesiva indice={1}>Python & AI Engineer</FitaAdesiva>
       </div>
       <div className="text-lg md:text-xl max-w-md">
-        <Adesivo indice={0}>Site em construcao, paginas novas em breve</Adesivo>
+        <Adesivo indice={0}>Site em construção, páginas novas em breve</Adesivo>
       </div>
       <div className="text-lg md:text-xl">
         <Carimbo indice={4}>EM BREVE</Carimbo>
