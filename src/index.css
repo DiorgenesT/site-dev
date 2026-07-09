@@ -5,6 +5,12 @@
   --color-branco-papel: #f2ede4;
   --color-vermelho-punk: #c81d25;
   --color-amarelo-fita: #e8b923;
+
+  /* As 3 familias do CLAUDE.md: maquina de escrever pro corpo, stencil pros
+     headlines/CTAs/carimbos, manuscrita de marcador pras anotacoes coladas. */
+  --font-maquina: 'Special Elite', 'Courier New', monospace;
+  --font-stencil: 'Allerta Stencil', 'Arial Narrow', sans-serif;
+  --font-manuscrita: 'Permanent Marker', 'Segoe Print', cursive;
 }
 
 .textura-granulada {

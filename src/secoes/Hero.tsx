@@ -1,7 +1,6 @@
 import type { RefObject } from 'react';
 import { NotaDeResgate } from '../componentes/NotaDeResgate';
 import { FitaAdesiva } from '../componentes/FitaAdesiva';
-import { rolarAte } from '../lib/movimento';
 
 interface HeroProps {
   refSecao: RefObject<HTMLElement>;
@@ -9,11 +8,16 @@ interface HeroProps {
 }
 
 export function Hero({ refSecao, refBotao }: HeroProps) {
-  function aoClicarVerProjetos(): void {
+  // Import dinamico: rolarAte arrasta GSAP/Lenis (lib/movimento). Um import
+  // estatico aqui forcaria esse peso pro mesmo chunk de App.tsx, violando o
+  // contrato de chunk lazy apos first paint (o clique so acontece depois).
+  async function aoClicarVerProjetos(): Promise<void> {
     const alvo = document.getElementById('projetos');
-    if (alvo) {
-      rolarAte(alvo);
+    if (!alvo) {
+      return;
     }
+    const { rolarAte } = await import('../lib/movimento');
+    rolarAte(alvo);
   }
 
   return (
@@ -27,8 +31,8 @@ export function Hero({ refSecao, refBotao }: HeroProps) {
       <button
         ref={refBotao}
         type="button"
-        onClick={aoClicarVerProjetos}
-        className="bg-vermelho-punk text-branco-papel px-6 py-3 font-bold uppercase tracking-widest"
+        onClick={() => void aoClicarVerProjetos()}
+        className="bg-vermelho-punk text-branco-papel px-6 py-3 font-stencil uppercase tracking-widest"
       >
         Ver projetos
       </button>

@@ -12,7 +12,7 @@ export function LabIA({ refSecao }: LabIAProps) {
       className="min-h-screen flex flex-col md:flex-row items-center gap-8 p-8"
     >
       <div className="flex-1 text-lg leading-relaxed">
-        <h2 className="text-2xl font-bold mb-4">LabIA</h2>
+        <h2 className="text-2xl font-stencil mb-4">LabIA</h2>
         <p>
           Na Monumental Assistencia 24hrs, automatizei operacoes de atendimento usando LLMs
           (LangChain, LangGraph, RAG) e dashboards, reduzindo em 35% o tempo de atendimento. Esse
