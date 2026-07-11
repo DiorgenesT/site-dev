@@ -1,7 +1,11 @@
 import { useRef } from 'react';
 import { FitaAdesiva } from '../componentes/FitaAdesiva';
 import { Adesivo } from '../componentes/Adesivo';
+import { PapelRasgado } from '../componentes/PapelRasgado';
 import { useAnimacaoColagem } from '../hooks/useAnimacaoColagem';
+import { obterRotacao } from '../estilos/tokens';
+
+const ROTACAO_FITA_FOTO = -18;
 
 export function Sobre() {
   const refConteudo = useRef<HTMLDivElement>(null);
@@ -33,14 +37,25 @@ export function Sobre() {
         </div>
         <div className="flex justify-center">
           <div
-            className="relative w-56 sm:w-64 aspect-[3/4] overflow-hidden shadow-lg"
             data-colagem
+            className="relative w-56 sm:w-64"
+            style={{ transform: `rotate(${obterRotacao(4)}deg)` }}
           >
-            <img
-              src="/image/foto-preta-branca.webp"
-              alt="Foto de Diorgenes George, ilustrada em preto e branco no estilo do site"
-              className="absolute inset-0 h-full w-full object-cover"
+            <PapelRasgado className="w-full h-3 text-branco-papel" />
+            <span
+              aria-hidden="true"
+              data-testid="sobre-fita-canto"
+              className="absolute -top-2 -left-5 z-10 block w-28 h-5 bg-amarelo-fita opacity-90"
+              style={{ transform: `rotate(${ROTACAO_FITA_FOTO}deg)` }}
             />
+            <div className="relative aspect-[3/4] overflow-hidden shadow-lg">
+              <img
+                src="/image/foto-sobre.webp"
+                alt="Foto de Diorgenes George, trabalhando em um notebook"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            </div>
+            <PapelRasgado className="w-full h-3 text-branco-papel rotate-180" />
           </div>
         </div>
       </div>

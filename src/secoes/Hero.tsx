@@ -51,9 +51,52 @@ const entradaCta: EntradaCamadaVars = {
   '--entrada-atraso': '0.38s',
 };
 
+const entradaMarcaEdicao: EntradaCamadaVars = {
+  '--entrada-escala': 1.4,
+  '--entrada-rotacao': '10deg',
+  '--entrada-y': '-12px',
+  '--entrada-blur': '3px',
+  '--entrada-duracao': '0.45s',
+  '--entrada-atraso': '0.5s',
+};
+
+const entradaSeloData: EntradaCamadaVars = {
+  '--entrada-escala': 1.4,
+  '--entrada-rotacao': '-10deg',
+  '--entrada-y': '-12px',
+  '--entrada-blur': '3px',
+  '--entrada-duracao': '0.45s',
+  '--entrada-atraso': '0.58s',
+};
+
+const entradaFitaCanto: EntradaCamadaVars = {
+  '--entrada-escala': 1.3,
+  '--entrada-rotacao': '-8deg',
+  '--entrada-y': '10px',
+  '--entrada-blur': '2px',
+  '--entrada-duracao': '0.4s',
+  '--entrada-atraso': '0.66s',
+};
+
+const entradaLombada: EntradaCamadaVars = {
+  '--entrada-escala': 1.3,
+  '--entrada-rotacao': '8deg',
+  '--entrada-y': '8px',
+  '--entrada-blur': '2px',
+  '--entrada-duracao': '0.4s',
+  '--entrada-atraso': '0.74s',
+};
+
+const ROTACAO_MARCA_EDICAO = -3;
+const ROTACAO_SELO_DATA = 2.5;
+const ROTACAO_FITA_CANTO = -42;
+
 export function Hero() {
   return (
-    <section id="hero" className="flex flex-col items-center gap-6 px-8 py-24 md:py-32 text-center">
+    <section
+      id="hero"
+      className="relative flex flex-col items-center gap-6 px-8 py-24 md:py-32 text-center"
+    >
       <div className="entrada-camada text-5xl md:text-7xl" style={entradaDg}>
         <NotaDeResgate texto="DG" />
       </div>
@@ -72,6 +115,58 @@ export function Hero() {
         >
           Ver projetos
         </button>
+      </div>
+
+      <div
+        aria-hidden="true"
+        className="hidden lg:block absolute top-8 left-8 entrada-camada"
+        style={entradaMarcaEdicao}
+      >
+        <span
+          className="block text-xs uppercase tracking-widest text-preto-tinta/60 font-bold"
+          style={{ transform: `rotate(${ROTACAO_MARCA_EDICAO}deg)` }}
+        >
+          Edição Nº 01
+        </span>
+      </div>
+
+      <div
+        aria-hidden="true"
+        className="hidden lg:block absolute top-8 right-8 entrada-camada"
+        style={entradaSeloData}
+      >
+        <span
+          className="block border border-preto-tinta/20 text-xs uppercase tracking-widest px-2 py-1 font-bold"
+          style={{ transform: `rotate(${ROTACAO_SELO_DATA}deg)` }}
+        >
+          Betim, 2026
+        </span>
+      </div>
+
+      <div
+        aria-hidden="true"
+        className="hidden lg:block absolute -left-6 bottom-10 entrada-camada"
+        style={entradaFitaCanto}
+      >
+        <span
+          data-testid="hero-fita-canto"
+          className="block w-28 h-5 bg-amarelo-fita opacity-90"
+          style={{ transform: `rotate(${ROTACAO_FITA_CANTO}deg)` }}
+        />
+      </div>
+
+      <div
+        aria-hidden="true"
+        className="hidden lg:block absolute right-6 top-1/2 -translate-y-1/2"
+      >
+        <div className="entrada-camada" style={entradaLombada}>
+          <span
+            className="block text-xs uppercase tracking-widest font-bold whitespace-nowrap"
+            style={{ transform: 'rotate(90deg)' }}
+          >
+            diorgenesgeorge.dev
+          </span>
+        </div>
       </div>
     </section>
   );
