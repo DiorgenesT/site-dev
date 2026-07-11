@@ -18,11 +18,12 @@ export function Sobre() {
             <FitaAdesiva indice={2}>Sobre</FitaAdesiva>
           </h2>
           <p>
-            Comecei gerenciando atendimento na Expresso Truck e na Monumental Assistência 24hrs. Na
-            Monumental, virei <Adesivo indice={8}>desenvolvedor Python</Adesivo>: automatizei
-            operações com LLMs e dashboards, reduzindo em 35% o tempo de atendimento. Hoje sou{' '}
+            Comecei na linha de frente do atendimento, na Expresso Truck e na Monumental
+            Assistência 24hrs. Foi lá que virei{' '}
+            <Adesivo indice={8}>desenvolvedor Python</Adesivo>: automatizei operações com LLMs e
+            dashboards, cortando 35% do tempo de atendimento. Hoje sou{' '}
             <Adesivo indice={5}>Analista Sênior</Adesivo> e{' '}
-            <Adesivo indice={8}>Desenvolvedor de Software</Adesivo> na Fundação Beta, centro de
+            <Adesivo indice={8}>Desenvolvedor de Software</Adesivo> na Fundação Beta, o centro de
             inovação e transformação digital da Prefeitura de Betim.
           </p>
           <p className="mt-4">
