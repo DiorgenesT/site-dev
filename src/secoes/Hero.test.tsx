@@ -59,4 +59,56 @@ describe('Hero', () => {
     expect(botao).not.toHaveClass('entrada-camada');
     expect(botao.getAttribute('style')).toContain(`rotate(${obterRotacao(4)}deg)`);
   });
+
+  it('a secao vira container relativo pra ancorar a moldura decorativa', () => {
+    const { container } = render(<Hero />);
+    const secao = container.querySelector('#hero');
+    expect(secao?.className).toContain('relative');
+  });
+
+  it('mostra a marca de edicao e o selo de data/local, decorativos e so visiveis em telas largas', () => {
+    render(<Hero />);
+
+    const marcaEdicao = screen.getByText('Edição Nº 01');
+    expect(marcaEdicao.closest('[aria-hidden="true"]')).toHaveClass('hidden', 'lg:block');
+
+    const selo = screen.getByText('Betim, 2026');
+    expect(selo.closest('[aria-hidden="true"]')).toHaveClass('hidden', 'lg:block');
+  });
+
+  it('mostra a lombada de texto vertical, decorativa e so visivel em telas largas', () => {
+    render(<Hero />);
+
+    const lombada = screen.getByText('diorgenesgeorge.dev');
+    expect(lombada.closest('[aria-hidden="true"]')).toHaveClass('hidden', 'lg:block');
+    expect(lombada.getAttribute('style')).toContain('rotate(90deg)');
+  });
+
+  it('a tira de fita do canto e puramente decorativa e so visivel em telas largas', () => {
+    render(<Hero />);
+
+    const fita = screen.getByTestId('hero-fita-canto');
+    expect(fita.closest('[aria-hidden="true"]')).toHaveClass('hidden', 'lg:block');
+  });
+
+  it('anima a moldura decorativa depois que o conteudo principal ja assentou', () => {
+    render(<Hero />);
+
+    const marcaEdicao = screen.getByText('Edição Nº 01').closest<HTMLElement>('.entrada-camada');
+    const selo = screen.getByText('Betim, 2026').closest<HTMLElement>('.entrada-camada');
+    const fita = screen.getByTestId('hero-fita-canto').closest<HTMLElement>('.entrada-camada');
+    const lombada = screen.getByText('diorgenesgeorge.dev').closest<HTMLElement>('.entrada-camada');
+
+    expect(marcaEdicao?.style.getPropertyValue('--entrada-atraso')).toBe('0.5s');
+    expect(selo?.style.getPropertyValue('--entrada-atraso')).toBe('0.58s');
+    expect(fita?.style.getPropertyValue('--entrada-atraso')).toBe('0.66s');
+    expect(lombada?.style.getPropertyValue('--entrada-atraso')).toBe('0.74s');
+  });
+
+  it('a marca de edicao e o selo mantem rotacao de repouso fixa, separada da animacao de entrada', () => {
+    render(<Hero />);
+
+    expect(screen.getByText('Edição Nº 01').getAttribute('style')).toContain('rotate(-3deg)');
+    expect(screen.getByText('Betim, 2026').getAttribute('style')).toContain('rotate(2.5deg)');
+  });
 });
