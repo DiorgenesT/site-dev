@@ -20,3 +20,28 @@
   mix-blend-mode: multiply;
   pointer-events: none;
 }
+
+@keyframes camadaEntrada {
+  0% {
+    opacity: 0;
+    filter: blur(var(--entrada-blur, 6px));
+    transform: scale(var(--entrada-escala, 2)) rotate(var(--entrada-rotacao, 20deg))
+      translateY(var(--entrada-y, -28px));
+  }
+  60% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1) rotate(0deg) translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .entrada-camada {
+    animation: camadaEntrada var(--entrada-duracao, 0.6s) cubic-bezier(0.22, 1.6, 0.36, 1) both;
+    animation-delay: var(--entrada-atraso, 0s);
+  }
+}

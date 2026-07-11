@@ -11,7 +11,7 @@ export default function Manutencao() {
         <NotaDeResgate texto="DG" />
       </div>
       <div className="text-xl md:text-2xl">
-        <FitaAdesiva indice={1}>Python & AI Engineer</FitaAdesiva>
+        <FitaAdesiva indice={1}>Full Stack Developer</FitaAdesiva>
       </div>
       <div className="text-lg md:text-xl max-w-md">
         <Adesivo indice={0}>Site em construção, páginas novas em breve</Adesivo>

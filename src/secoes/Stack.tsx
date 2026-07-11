@@ -1,4 +1,7 @@
+import { useRef } from 'react';
 import { Adesivo } from '../componentes/Adesivo';
+import { FitaAdesiva } from '../componentes/FitaAdesiva';
+import { useAnimacaoColagem } from '../hooks/useAnimacaoColagem';
 
 const TECNOLOGIAS = [
   'Python',
@@ -17,17 +20,23 @@ const TECNOLOGIAS = [
 ] as const;
 
 export function Stack() {
+  const refSecao = useRef<HTMLElement>(null);
+  useAnimacaoColagem(refSecao);
+
   return (
     <section
+      ref={refSecao}
       id="stack"
-      className="min-h-screen flex flex-col items-center justify-center gap-8 p-8"
+      className="flex flex-col items-center gap-8 px-8 py-16 md:py-24"
     >
-      <h2 className="text-2xl">Stack</h2>
+      <h2 data-colagem>
+        <FitaAdesiva indice={4}>Stack</FitaAdesiva>
+      </h2>
       <div className="flex flex-wrap justify-center gap-3 max-w-2xl">
         {TECNOLOGIAS.map((tecnologia, indice) => (
-          <Adesivo key={tecnologia} indice={indice}>
-            {tecnologia}
-          </Adesivo>
+          <span key={tecnologia} data-colagem>
+            <Adesivo indice={indice}>{tecnologia}</Adesivo>
+          </span>
         ))}
       </div>
     </section>
