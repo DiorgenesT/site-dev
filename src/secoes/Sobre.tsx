@@ -1,23 +1,47 @@
-import { Carimbo } from '../componentes/Carimbo';
+import { useRef } from 'react';
+import { FitaAdesiva } from '../componentes/FitaAdesiva';
+import { Adesivo } from '../componentes/Adesivo';
+import { useAnimacaoColagem } from '../hooks/useAnimacaoColagem';
 
 export function Sobre() {
+  const refConteudo = useRef<HTMLDivElement>(null);
+  useAnimacaoColagem(refConteudo);
+
   return (
-    <section id="sobre" className="min-h-screen flex items-center gap-8 p-8">
-      <div className="flex-1 text-lg leading-relaxed">
-        <h2 className="text-2xl mb-4">Sobre</h2>
-        <p>
-          Comecei gerenciando atendimento na Expresso Truck e na Monumental Assistência 24hrs. Na
-          Monumental, virei desenvolvedor Python: automatizei operações com LLMs e dashboards,
-          reduzindo em 35% o tempo de atendimento. Hoje sou Analista Sênior e Desenvolvedor na
-          Fundação Beta, Prefeitura de Betim.
-        </p>
-        <p className="mt-4">
-          Pós-Graduação em Sistemas com Python (UniCesumar) e Bacharelado em Ciência da Computação
-          (Cruzeiro do Sul).
-        </p>
-      </div>
-      <div className="shrink-0">
-        <Carimbo indice={2}>DG, EST. 2026</Carimbo>
+    <section id="sobre" className="py-16 md:py-24 px-8">
+      <div
+        ref={refConteudo}
+        className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center"
+      >
+        <div className="text-lg leading-[1.75]">
+          <h2 className="mb-6" data-colagem>
+            <FitaAdesiva indice={2}>Sobre</FitaAdesiva>
+          </h2>
+          <p>
+            Comecei gerenciando atendimento na Expresso Truck e na Monumental Assistência 24hrs. Na
+            Monumental, virei <Adesivo indice={8}>desenvolvedor Python</Adesivo>: automatizei
+            operações com LLMs e dashboards, reduzindo em 35% o tempo de atendimento. Hoje sou{' '}
+            <Adesivo indice={5}>Analista Sênior</Adesivo> e{' '}
+            <Adesivo indice={8}>Desenvolvedor de Software</Adesivo> na Fundação Beta, centro de
+            inovação e transformação digital da Prefeitura de Betim.
+          </p>
+          <p className="mt-4">
+            <Adesivo indice={2}>Pós-Graduação</Adesivo> em Sistemas com Python (UniCesumar) e{' '}
+            <Adesivo indice={9}>Bacharelado</Adesivo> em Ciência da Computação (Cruzeiro do Sul).
+          </p>
+        </div>
+        <div className="flex justify-center">
+          <div
+            className="relative w-56 sm:w-64 aspect-[3/4] overflow-hidden shadow-lg"
+            data-colagem
+          >
+            <img
+              src="/image/foto-preta-branca.webp"
+              alt="Foto de Diorgenes George, ilustrada em preto e branco no estilo do site"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          </div>
+        </div>
       </div>
     </section>
   );
